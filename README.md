@@ -137,6 +137,8 @@ scripts/                  # other useful scripts
 
 # Deployment Notes
 
+> You can check a **live demo** of the deployment here: https://lab.diegosevilla.dev/
+
 This template is intended for deployment in **us-east-1**, which is required for ACM certificates used with CloudFront.
 
 High-level flow:
