@@ -27,7 +27,7 @@
   },
   {
     "ParameterKey": "HostedZoneId",
-    "ParameterValue": "Z00073171ATRAOHT1QTOE"
+    "ParameterValue": "<YOUR_HOSTED_ZONE_ID>"
   },
   {
     "ParameterKey": "CreateApex",

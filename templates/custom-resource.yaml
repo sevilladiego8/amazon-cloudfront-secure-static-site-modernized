@@ -22,6 +22,7 @@ Resources:
 
   S3BucketLogs:
     Type: AWS::S3::Bucket
+    # will not be deleted in cascade if the cloudFormation stack is deleted
     DeletionPolicy: Retain
     Properties:
       BucketName: !Ref S3BucketLogsName
@@ -43,6 +44,7 @@ Resources:
   # 3. the bucket is not public (and shouldn't be)
   S3BucketRoot:
     Type: AWS::S3::Bucket
+    # will not be deleted in cascade if the cloudFormation stack is deleted
     DeletionPolicy: Retain
     Properties:
       BucketName: !Ref S3BucketRootName

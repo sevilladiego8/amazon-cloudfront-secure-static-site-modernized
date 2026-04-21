@@ -21,6 +21,7 @@ This project was started from the public `aws-samples/amazon-cloudfront-secure-s
     <img src="./assets/aws-cloudfront-secure-static-site-modern.png" alt="aws-cloudfront-secure-static-site-modern-diagram" justify="center">
 <p>
 
+0.  [Prerequisites](#prerequisites)
 1.  [What This Project Deploys?](#what-this-project-deploys)
 2.  [Purpose of The Project](#purpose-of-the-project)
 3.  [Modernization Summary](#modernization-summary)
@@ -31,6 +32,12 @@ This project was started from the public `aws-samples/amazon-cloudfront-secure-s
 8.  [Provenance Note](#provenance-note)
 9.  [Useful Resources](#useful-resources)
 10. [License](#license)
+
+
+# Prerequisites
+
+1. You need a registered domain name, such as `customdomain.com`, and point it to a **Route 53 hosted zone** in the same AWS account in which you deploy this solution. See [Configuring Amazon Route 53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring.html) as your DNS service to learn more
+2. You need the **AWS CLI** installed on your machine. Check [AWS CLI Docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) to learn more.
 
 # What this project deploys?
 
@@ -166,6 +173,8 @@ This repo is intended as a modernization and customization of that template, esp
 ---
 
 # Useful Resources
+
+- [AWS CLI Getting Started](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
 
 - [AWS cloudformation reference guide](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-guide.html)
 

@@ -204,7 +204,7 @@ Resources:
     Type: AWS::CloudFront::OriginRequestPolicy
     Properties:
       OriginRequestPolicyConfig:
-        Name: DsOriginRequestPolicyGeo
+        Name: YourBrandOriginRequestPolicyGeo
         Comment: Works together with YourBrandCacheRequestPolicyCompressionGeo
         HeadersConfig:
           HeaderBehavior: whitelist
@@ -233,7 +233,7 @@ Resources:
           EnableAcceptEncodingGzip: true
           HeadersConfig:
             HeaderBehavior: whitelist
-            Whitelist:
+            Headers:
               - CloudFront-Viewer-Country-Name
               - CloudFront-Viewer-City
           QueryStringsConfig:
