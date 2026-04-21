@@ -33,7 +33,7 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       Tags:
-        - Key: YouBrand Website Solution
+        - Key: YourBrand Website Solution
           Value: ACFS3
 
   # NOTEs: 
@@ -54,7 +54,7 @@ Resources:
         DestinationBucketName: !Ref 'S3BucketLogsName'
         LogFilePrefix: 'origin/'
       Tags:
-        - Key: YouBrand Website Solution
+        - Key: YourBrand Website Solution
           Value: ACFS3
 
   CopyLayerVersion:

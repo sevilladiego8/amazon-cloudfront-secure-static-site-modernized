@@ -87,7 +87,7 @@ Resources:
         CopyLayerVersionName: !Ref CopyLayerVersionName
         CopyFunctionName: !Ref CopyFunctionName
       Tags:
-        - Key: YouBrand Website Solution
+        - Key: YourBrand Website Solution
           Value: ACFS3
 
   AcmCertificateStack:
@@ -100,7 +100,7 @@ Resources:
         CreateApex: !Ref CreateApex
         HostedZoneId: !Ref HostedZoneId
       Tags:
-        - Key: YouBrand Website Solution
+        - Key: YourBrand Website Solution
           Value: ACFS3
 
   CloudFrontStack:
@@ -120,7 +120,7 @@ Resources:
         Response404File: !Ref Response404File
         Response403File: !Ref Response403File
       Tags:
-        - Key: YouBrand Website Solution
+        - Key: YourBrand Website Solution
           Value: ACFS3
 
 Outputs:

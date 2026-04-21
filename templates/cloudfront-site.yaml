@@ -205,7 +205,7 @@ Resources:
     Properties:
       OriginRequestPolicyConfig:
         Name: DsOriginRequestPolicyGeo
-        Comment: Works together with CacheRequestPolicyCompressionGeo
+        Comment: Works together with YourBrandCacheRequestPolicyCompressionGeo
         HeadersConfig:
           HeaderBehavior: whitelist
           Headers:
@@ -225,7 +225,7 @@ Resources:
         DefaultTTL: 86400
         MaxTTL: 31536000
         MinTTL: 1
-        Name: CacheRequestPolicyCompressionGeo
+        Name: YourBrandCacheRequestPolicyCompressionGeo
         ParametersInCacheKeyAndForwardedToOrigin:
           CookiesConfig:
             CookieBehavior: none

@@ -11,7 +11,7 @@ Modern CloudFront Secure Static Site on AWS
 
 A modernized CloudFormation-based template for deploying a secure static website on AWS with **Amazon S3**, **Amazon CloudFront**, **AWS Certificate Manager (ACM)**, and **Amazon Route 53**.
 
-This project was started from the public `aws-samples/amazon-cloudfront-secure-static-site` template lineage and was updated to move away from the older **v0.5** implementation towards the newer **v0.12** style architecture and practices.
+This project was started from the public `aws-samples/amazon-cloudfront-secure-static-site` template series and was updated to move away from the older **v0.5** implementation towards the newer **v0.12** style architecture and practices.
 
 > **The goal of this repo is simple**: make the solution easier to deploy today, align it with more current CloudFront/S3 patterns, and keep the infrastructure explicit and customizable.
 
@@ -34,13 +34,13 @@ This project was started from the public `aws-samples/amazon-cloudfront-secure-s
 
 # What this project deploys?
 
-- An S3 bucket for static website assets
-- An S3 bucket for access logs
-- An ACM certificate for the domain
-- A CloudFront distribution in front of the S3 origin
-- Route 53 alias records for the subdomain and, optionally, the apex domain
-- A custom resource that uploads the sample/static assets to the origin bucket
-- CloudFront security headers, cache policy, and origin request policy
+- An **S3 bucket** for static website assets
+- An **S3 bucket** for access **logs**
+- An **ACM certificate** for the domain
+- A **CloudFront distribution** in front of the **S3 origin**
+- **Route 53** alias records for the subdomain and, optionally, the apex domain
+- A custom resource that uploads the `sample/static` assets to the origin bucket
+- **CloudFront security headers**, **cache policy**, and **origin request policy**
 
 # Purpose of the project
 
