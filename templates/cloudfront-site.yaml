@@ -1,16 +1,19 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: ACFS3 - CloudFront with Header Security and site content
+Description: |
+  Creates a CloudFront distribution for a secure static website using a private S3 origin 
+  with Origin Access Control (OAC), ACM certificate, custom cache and origin request policies, 
+  and response headers for enhanced security
 Transform: 'AWS::Serverless-2016-10-31'
 
 Parameters:
   CertificateArn:
-    Description: Certificate locator
+    Description: ARN of the ACM certificate used by the CloudFront distribution
     Type: String
   DomainName:
-    Description: Apex domain name 
+    Description: Apex domain name (e.g., example.com)
     Type: String
   SubDomain:
-    Description: Subdomain for the site 
+    Description: Subdomain for the site (e.g., www)
     Type: String
   CreateApex:
     Description: Whether to create a Route 53 record for the apex domain (yes/no)
@@ -25,16 +28,16 @@ Parameters:
     Description: ARN of the S3 content bucket
     Type: String
   S3BucketLogs:
-    Description: S3 bucket used for CloudFront access logs
+    Description: Name of the S3 bucket used for CloudFront access logs
     Type: String
   S3BucketLogsDomainName:
-    Description: S3 logging bucket
+    Description: Domain name of the S3 logging bucket
     Type: String
   Response404File:
-    Description: HTML file returned for 404 errors
+    Description: Path to the custom HTML file returned for 404 errors
     Type: String
   Response403File:
-    Description: HTML file returned for 403 errors
+    Description: Path to the custom HTML file returned for 403 errors
     Type: String
 
 Conditions:
@@ -238,9 +241,9 @@ Resources:
 
 Outputs:
   CloudFrontDistributionDomainName:
-    Description: CloudFront distribution
+    Description: Domain name assigned to the CloudFront distribution (used for DNS alias records)
     Value: !GetAtt CloudFrontDistribution.DomainName
 
   CloudFrontWebsiteAdress:
-    Description: Website address
+    Description: Public URL of the static website served via CloudFront
     Value: !Sub '${SubDomain}.${DomainName}'

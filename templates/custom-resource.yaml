@@ -2,110 +2,71 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: ACFS3 - Cert Provider with DNS validation
 Transform: AWS::Serverless-2016-10-31
 
+# see description of params in main.yaml
+Parameters:
+  S3BucketRootName:
+    Type: String
+  S3BucketLogsName:
+    Type: String
+  CopyLayerVersionName:
+    Type: String
+  CopyFunctionName:
+    Type: String
+
 Resources:
-  LambdaPermission:
-    Type: AWS::Lambda::Permission
+  CopyCustomResource:
+    Type: 'AWS::CloudFormation::CustomResource'
     Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !GetAtt CFNCustomProvider.Arn
-      Principal: !GetAtt LambdaRole.Arn
-
-  LambdaPolicy:
-    Type: AWS::IAM::Policy
-    DependsOn:
-      - LambdaRole
-    Properties:
-      PolicyName: CFNCertificateDomainResourceRecordProvider
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action:
-              - acm:RequestCertificate
-              - acm:DescribeCertificate
-              - acm:UpdateCertificateOptions
-              - acm:DeleteCertificate
-            Resource:
-            - '*'
-          - Effect: Allow
-            Action:
-              - logs:*
-            Resource: arn:aws:logs:*:*:*
-      Roles:
-        - !Ref LambdaRole
-
-  LambdaRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Action:
-              - sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-      Tags:
-        - Key: Solution
-          Value: ACFS3
-
-  CFNCustomProviderLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      RetentionInDays: 7
-      LogGroupName: !Sub '/aws/lambda/${CFNCustomProvider}'
-    DependsOn:
-      - CFNCustomProvider
-
-  CFNCustomProvider:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: s3://binxio-public-us-east-1/lambdas/cfn-certificate-provider-0.2.4.zip
-      Description: CFN Certificate Domain Resource Record Provider
-      MemorySize: 128
-      Handler: provider.handler
-      Timeout: 300
-      Role: !GetAtt LambdaRole.Arn
-      Runtime: python3.6
+      ServiceToken: !GetAtt CopyFunction.Arn 
+      ServiceTimeout: 30
 
   S3BucketLogs:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     Properties:
-      AccessControl: LogDeliveryWrite
+      BucketName: !Ref S3BucketLogsName
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       Tags:
-        - Key: Solution
+        - Key: YouBrand Website Solution
           Value: ACFS3
 
+  # NOTEs: 
+  # 1. The root bucket doesn't need to be configured as a static website because this is not required
+  # when Cloud Front handles routing like 404s, index.html, etc. Communication happens via REST API
+  # 2. websiteConfiguration: {...} is not required for that reason
+  # 3. the bucket is not public (and shouldn't be)
   S3BucketRoot:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     Properties:
+      BucketName: !Ref S3BucketRootName
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       LoggingConfiguration:
-        DestinationBucketName: !Ref 'S3BucketLogs'
-        LogFilePrefix: 'cdn/'
+        DestinationBucketName: !Ref 'S3BucketLogsName'
+        LogFilePrefix: 'origin/'
       Tags:
-        - Key: Solution
+        - Key: YouBrand Website Solution
           Value: ACFS3
-  
+
   CopyLayerVersion:
-    Type: "AWS::Serverless::LayerVersion"
+    Type: 'AWS::Serverless::LayerVersion'
     Properties:
+      LayerName: !Ref CopyLayerVersionName
       ContentUri: ../witch.zip
       CompatibleRuntimes:
-        - nodejs12.x
+        - nodejs20.x
 
   CopyRole:
-    Type: "AWS::IAM::Role"
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
         Statement:
@@ -116,11 +77,29 @@ Resources:
               - sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      Policies:
+        - PolicyName: S3CopyPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                Resource:
+                  - !Sub
+                    - arn:aws:s3:::${TargetBucket}/*
+                    - TargetBucket: !Ref S3BucketRoot
+                  - !Sub
+                    - arn:aws:s3:::${TargetBucket}
+                    - TargetBucket: !Ref S3BucketRoot
 
   CopyFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Ref CopyFunctionName
       CodeUri: ../www
       Environment:
         Variables:
@@ -129,15 +108,15 @@ Resources:
       Layers:
         - !Ref CopyLayerVersion
       Role: !GetAtt CopyRole.Arn
-      Runtime: nodejs12.x
+      Runtime: nodejs20.x
       Timeout: 300
 
 Outputs:
   S3BucketRoot:
     Description: Website bucket
     Value: !Ref S3BucketRoot
-  S3BucketRootName:
-    Description: Website bucket name
+  S3BucketRootDomainName:
+    Description: Website bucket domain name
     Value: !GetAtt S3BucketRoot.DomainName
   S3BucketRootArn:
     Description: Website bucket locator
@@ -145,12 +124,9 @@ Outputs:
   S3BucketLogs:
     Description: Logging bucket
     Value: !Ref S3BucketLogs
-  S3BucketLogsName:
-    Description: Logging bucket Name
+  S3BucketLogsDomainName:
+    Description: Logging bucket domain name ex. customname.s3.us-east-1.amazonaws.com
     Value: !GetAtt S3BucketLogs.DomainName
-  CFNCustomProvider:
-    Description: ACM helper function
-    Value: !GetAtt CFNCustomProvider.Arn
   CopyFunction:
     Description: S3 helper function
     Value: !GetAtt CopyFunction.Arn

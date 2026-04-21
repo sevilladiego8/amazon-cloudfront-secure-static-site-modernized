@@ -1,5 +1,8 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: ACFS3 - S3 Static site with CF and ACM (uksb-1qnk6ni7b) (version:v0.5)
+Description: | 
+  Deploys a secure static website on AWS using Amazon S3 and CloudFront with
+  an ACM certificate, Origin Access Control (OAC), and modern caching and
+  security best practices
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -78,6 +81,11 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./custom-resource.yaml
+      Parameters:
+        S3BucketRootName: !Ref S3BucketRootName
+        S3BucketLogsName: !Ref S3BucketLogsName
+        CopyLayerVersionName: !Ref CopyLayerVersionName
+        CopyFunctionName: !Ref CopyFunctionName
       Tags:
         - Key: YouBrand Website Solution
           Value: ACFS3
