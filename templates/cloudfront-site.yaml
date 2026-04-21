@@ -79,6 +79,12 @@ Resources:
           TargetOriginId: !Sub 'S3-${AWS::StackName}-root'
           ViewerProtocolPolicy: 'redirect-to-https'
           ResponseHeadersPolicyId: !Ref ResponseHeadersPolicy
+          # reference custom request policies
+          OriginRequestPolicyId: !Ref OriginRequestPolicy
+          CachePolicyId: !Ref CachePolicy
+          # NOTES
+          # - reference an AWS-managed or custom OriginRequest/Cache Policy for geolocation and/or compression fine tunnning
+          # - CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 <-- CachingOptimized, recommended for s3
         CustomErrorResponses:
           - ErrorCachingMinTTL: 60
             ErrorCode: 404
@@ -165,11 +171,17 @@ Resources:
           ContentSecurityPolicy:
             # edit as needed. ex.
             # default-src 'self';
-            # img-src 'self'; --> for website imgs
-            # script-src 'self'; --> for scripts
-            # style-src 'self'; --> to accept dynamic inline styles added by MUI, Bootstrap, COREUI, google Maps, etc.
-            # object-src 'none';
-            ContentSecurityPolicy: "default-src 'none'; img-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'"
+            # img-src 'self' https: data: blob:; --> for website imgs, https CDN services
+            # script-src 'self' https://maps.googleapis.com https://maps.gstatic.com https://*.google-analytics.com https://*.googletagmanager.com https://*.g.doubleclick.net/ https://*.google.com 'unsafe-eval' 'unsafe-inline' blob:; --> for lottie-web and gMaps execution
+            # style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; --> to accept dynamic inline styles added by MUI, Bootstrap, COREUI, google Maps, etc.
+            # object-src 'self';
+            # worker-src 'self' blob: --> for lottie webworkers
+            # font-src 'self' https: data:; --> for https fonts CDN services
+            # media-src 'self' blob: https:;
+            # child-src 'self' blob:;
+            # connect-src 'self' https: blob: data:; --> for lotiefiles cdn services, github contributions
+            # frame-src 'self' https://www.googletagmanager.com https://www.youtube.com https://www.youtube-nocookie.com https://open.spotify.com; --> for irames
+            ContentSecurityPolicy: "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' https://maps.googleapis.com https://maps.gstatic.com https://*.google-analytics.com https://*.googletagmanager.com https://*.g.doubleclick.net/ https://*.google.com 'unsafe-eval' 'unsafe-inline' blob:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; object-src 'self'; worker-src 'self' blob:; font-src 'self' https: data:; media-src 'self' blob: https:; child-src 'self' blob:; connect-src 'self' https: blob: data:; frame-src 'self' https://www.googletagmanager.com https://www.youtube.com https://www.youtube-nocookie.com https://open.spotify.com;"
             Override: true
           ContentTypeOptions:
             Override: true
@@ -183,6 +195,46 @@ Resources:
             ModeBlock: true
             Override: true
             Protection: true
+
+  # OriginRequestPolicy configured to forward geolocation headers from CloudFront
+  OriginRequestPolicy:
+    Type: AWS::CloudFront::OriginRequestPolicy
+    Properties:
+      OriginRequestPolicyConfig:
+        Name: DsOriginRequestPolicyGeo
+        Comment: Works together with CacheRequestPolicyCompressionGeo
+        HeadersConfig:
+          HeaderBehavior: whitelist
+          Headers:
+            - CloudFront-Viewer-Country-Name
+            - CloudFront-Viewer-City
+        CookiesConfig:
+          CookieBehavior: none
+        QueryStringsConfig:
+          QueryStringBehavior: none
+
+  # CacheRequestPolicy added for gzip/brotli compression and users Location tracking
+  CachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Comment: Same as CachingOptimized (658327ea-f89d-4fab-a63d-7e88639e58f6) but with extra geo headers
+        DefaultTTL: 86400
+        MaxTTL: 31536000
+        MinTTL: 1
+        Name: CacheRequestPolicyCompressionGeo
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Whitelist:
+              - CloudFront-Viewer-Country-Name
+              - CloudFront-Viewer-City
+          QueryStringsConfig:
+            QueryStringBehavior: none
 
 Outputs:
   CloudFrontDistributionDomainName:

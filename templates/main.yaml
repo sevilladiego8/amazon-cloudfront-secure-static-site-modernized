@@ -13,9 +13,38 @@ Metadata:
 Mappings:
   Solution:
     Constants:
-      Version: 'v0.5'
+      Version: 'v0.12'
+
+Rules:
+  OnlyUsEast1:
+    Assertions:
+      - Assert:
+          Fn::Equals:
+            - !Ref AWS::Region
+            - us-east-1
+        AssertDescription: |
+          This template can only be deployed in the us-east-1 region.
+          This is because the ACM Certificate must be created in us-east-1
 
 Parameters:
+  # custom-resource params
+  S3BucketRootName:
+    Description: the name of the bucket that will have the website contents
+    Type: String
+    Default: "example.com"
+  S3BucketLogsName:
+    Description: the name of the bucket that will contain the logs related to the website
+    Type: String
+    Default: "example.com.logs"
+  CopyLayerVersionName:
+    Description: the name of the lambda layer version
+    Type: String
+    Default: "examplecom-lambda-layer-version"
+  CopyFunctionName:
+    Description: the name of the lambda function that uploads www/ assets to s3 bucket 
+    Type: String
+    Default: "examplecom-lambda"
+  # acm-certificate params
   SubDomain:
     Description: The part of a website address before your DomainName - e.g. www or img
     Type: String
@@ -24,6 +53,25 @@ Parameters:
   DomainName:
     Description: The part of a website address after your SubDomain - e.g. example.com
     Type: String
+    Default: example.com
+  HostedZoneId:
+    Description: HostedZoneId for the domain e.g. Z23ABC4XYZL05B
+    Type: String
+    Default: MUST_SPECIFY_AN_ID
+  CreateApex:
+    Description: Create an Apex Alias in CloudFront distribution - yes/no
+    Type: String
+    Default: "yes"
+    AllowedValues: ["yes", "no"]
+  # cloufdront-site params
+  Response404File:
+    Description: the html file to redirect 404 erorrs ex. 404.html
+    Type: String
+    Default: "/404.html"
+  Response403File:
+    Description: the html file to redirect 403 erorrs ex. 403.html
+    Type: String
+    Default: "/403.html"
 
 Resources:
   CustomResourceStack:
@@ -31,7 +79,7 @@ Resources:
     Properties:
       TemplateURL: ./custom-resource.yaml
       Tags:
-        - Key: Solution
+        - Key: YouBrand Website Solution
           Value: ACFS3
 
   AcmCertificateStack:
@@ -39,11 +87,12 @@ Resources:
     Properties:
       TemplateURL: ./acm-certificate.yaml
       Parameters:
+        SubDomain: !Ref SubDomain
         DomainName: !Ref DomainName
-        CFNCustomProvider: !GetAtt CustomResourceStack.Outputs.CFNCustomProvider
-        CopyFunction: !GetAtt CustomResourceStack.Outputs.CopyFunction
+        CreateApex: !Ref CreateApex
+        HostedZoneId: !Ref HostedZoneId
       Tags:
-        - Key: Solution
+        - Key: YouBrand Website Solution
           Value: ACFS3
 
   CloudFrontStack:
@@ -54,21 +103,23 @@ Resources:
         CertificateArn: !GetAtt AcmCertificateStack.Outputs.CertificateArn
         DomainName: !Ref DomainName
         SubDomain: !Ref SubDomain
+        CreateApex: !Ref CreateApex
         S3BucketRoot: !GetAtt CustomResourceStack.Outputs.S3BucketRoot
-        S3BucketRootName: !GetAtt CustomResourceStack.Outputs.S3BucketRootName
+        S3BucketRootDomainName: !GetAtt CustomResourceStack.Outputs.S3BucketRootDomainName
         S3BucketRootArn: !GetAtt CustomResourceStack.Outputs.S3BucketRootArn
         S3BucketLogs: !GetAtt CustomResourceStack.Outputs.S3BucketLogs
-        S3BucketLogsName: !GetAtt CustomResourceStack.Outputs.S3BucketLogsName
+        S3BucketLogsDomainName: !GetAtt CustomResourceStack.Outputs.S3BucketLogsDomainName
+        Response404File: !Ref Response404File
+        Response403File: !Ref Response403File
       Tags:
-        - Key: Solution
+        - Key: YouBrand Website Solution
           Value: ACFS3
 
 Outputs:
-  CFNCustomProvider:
-    Description: ACM helper function    
-    Value: !GetAtt CustomResourceStack.Outputs.CFNCustomProvider
+  SolutionVersion:
+    Value: !FindInMap [Solution, Constants, Version]
   CopyFunction:
-    Description: S3 helper function    
+    Description: S3 helper function
     Value: !GetAtt CustomResourceStack.Outputs.CopyFunction
   S3BucketLogs:
     Description: Logging bucket
@@ -76,23 +127,18 @@ Outputs:
   S3BucketRoot:
     Description: Website bucket
     Value: !GetAtt CustomResourceStack.Outputs.S3BucketRoot
-  S3BucketLogsName:
-    Description: Logging bucket name
-    Value: !GetAtt CustomResourceStack.Outputs.S3BucketLogsName
-  S3BucketRootName:
-    Description: Website bucket name
-    Value: !GetAtt CustomResourceStack.Outputs.S3BucketRootName
+  S3BucketLogsDomainName:
+    Description: Logging bucket domain name
+    Value: !GetAtt CustomResourceStack.Outputs.S3BucketLogsDomainName
+  S3BucketRootDomainName:
+    Description: Website bucket domain name
+    Value: !GetAtt CustomResourceStack.Outputs.S3BucketRootDomainName
   CertificateArn:
-    Description: Issued certificate 
+    Description: Issued certificate
     Value: !GetAtt AcmCertificateStack.Outputs.CertificateArn
-  CFDistributionName:
+  CloudFrontDistributionDomainName:
     Description: CloudFront distribution
-    Value: !GetAtt CloudFrontStack.Outputs.CloudFrontDistribution
-  LambdaEdgeFunctionVersion:
-    Description: Security Lambda version
-    Value: !GetAtt CloudFrontStack.Outputs.LambdaEdgeFunctionVersion
-  CloudFrontDomainName:
+    Value: !GetAtt CloudFrontStack.Outputs.CloudFrontDistributionDomainName
+  CloudFrontWebsiteAdress:
     Description: Website address
-    Value: !GetAtt CloudFrontStack.Outputs.CloudFrontDomainName
-  SolutionVersion:
-    Value: !FindInMap [Solution, Constants, Version]
+    Value: !GetAtt CloudFrontStack.Outputs.CloudFrontWebsiteAdress
