@@ -49,6 +49,8 @@ This project was started from the public `aws-samples/amazon-cloudfront-secure-s
 - A custom resource that uploads the `sample/static` assets to the origin bucket
 - **CloudFront security headers**, **cache policy**, and **origin request policy**
 
+> You can check a **live demo** of the deployment here: https://lab.diegosevilla.dev/
+
 # Purpose of the project
 
 The original upstream project is useful, but the older **v0.5** implementation used patterns that are now _outdated_ for a fresh deployment, including:
@@ -137,7 +139,7 @@ scripts/                  # other useful scripts
 
 # Deployment Notes
 
-> You can check a **live demo** of the deployment here: https://lab.diegosevilla.dev/
+> You can check a **live demo** of the deployment here [What This Project Deploys?](#what-this-project-deploys)
 
 This template is intended for deployment in **us-east-1**, which is required for ACM certificates used with CloudFront.
 
