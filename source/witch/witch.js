@@ -1,3 +1,14 @@
+/**
+ * witch.js is a small AWS Lambda function used during deployment to upload the static website assets to Amazon S3.
+ * -
+ * It runs as part of a CloudFormation custom resource and, on stack creation or update, it: 
+ * - Recursively scans the packaged site files
+ * - Detects and assigns correct MIME types
+ * - Uploads all assets to the configured S3 bucket
+ * 
+ * Once the upload is complete, it signals success or failure back to CloudFormation so the deployment can proceed.
+ */
+
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const fs = require('node:fs');
 const path = require('node:path');

@@ -3,11 +3,12 @@
  This Node.js script does the following:
 
 - Recursively scans `dist/` folder
-- Uploads files to your S3 bucket
-- if your frontend app has gzip compression enabled, it detects `.gz` files and:
+- Uploads files to your S3 bucket using @aws-sdk/client-s3
+- if your project has gzip compression enable it detects `.gz` files and:
     - Renames them to their original name (`main.js.gz` → `main.js`)
     - Sets `Content-Encoding: gzip`
     - Infers `Content-Type` from extension
+- if your project doesn't has gzip, it will skip gzip part, but still upload your files with the right mime types
 - Sets `Cache-Control` headers for long-term caching
 
 ### 🔧 Prerequisites:
@@ -15,18 +16,22 @@
 - Node.js installed
 - AWS CLI or credentials set in your environment
 - Install AWS SDK:
-> npm install aws-sdk mime-types
+> npm i @aws-sdk/client-s3 mime-types
  */
 
 const fs = require('fs');
 const path = require('path');
 const mime = require('mime-types');
-const AWS = require('@aws-sdk/client-s3');
+// const { argv } = require('process')
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
-const BUCKET_NAME = 'diegosevilla.dev';
-const DIST_DIR = path.resolve(__dirname, 'dist');
+// CONFIG — adjust these as needed
+const BUCKET_NAME = process.env.AWS_S3_BUCKET || 'customdomain.com';
+const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
+const DIST_DIR = path.resolve(__dirname, '../dist');
+console.log('Reading/Uploading files in ', DIST_DIR);
 
-const s3 = new AWS.S3();
+const s3 = new S3Client({ region: AWS_REGION }); // e.g. us-east-1
 
 function walkDir(dir, callback) {
   fs.readdirSync(dir).forEach((file) => {
@@ -56,27 +61,30 @@ function uploadFile(filePath) {
     Body: body,
     ContentType: contentType,
     CacheControl: 'max-age=31536000, public',
-    ...(contentEncoding ? { ContentEncoding: contentEncoding } : {}),
+    ...(contentEncoding && { ContentEncoding: contentEncoding }),
   };
 
   return s3
-    .upload(params)
-    .promise()
-    .then(() =>
-      console.log(`Uploaded: ${s3Key} (${isGzipped ? 'gzip' : 'raw'})`),
-    );
+    .send(new PutObjectCommand(params))
+    .then(() => {
+      console.log(`✅ Uploaded: ${s3Key} (${isGzipped ? 'gzipped' : 'raw'})`);
+    })
+    .catch((err) => {
+      console.error(`❌ Failed to upload ${s3Key}:`, err.message);
+    });
 }
 
 async function main() {
   const uploadPromises = [];
+
   walkDir(DIST_DIR, (filePath) => {
     uploadPromises.push(uploadFile(filePath));
   });
 
   await Promise.all(uploadPromises);
-  console.log('✅ Upload complete!');
+  console.log('✅ All files uploaded.');
 }
 
 main().catch((err) => {
-  console.error('❌ Upload failed:', err);
+  console.error('❌ Upload process failed:', err);
 });

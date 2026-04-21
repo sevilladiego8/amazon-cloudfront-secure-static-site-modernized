@@ -1,0 +1,46 @@
+[
+  {
+    "ParameterKey": "S3BucketRootName",
+    "ParameterValue": "customdomain.com"
+  },
+  {
+    "ParameterKey": "S3BucketLogsName",
+    "ParameterValue": "customdomain.com.logs"
+  },
+  {
+    "ParameterKey": "CopyLayerVersionName",
+    "ParameterValue": "customdomaincom-lambda-layer-version"
+  },
+  {
+    "ParameterKey": "CopyFunctionName",
+    "ParameterValue": "customdomaincom-lambda-copy"
+  },
+
+
+  {
+    "ParameterKey": "DomainName",
+    "ParameterValue": "customdomain.com"
+  },
+  {
+    "ParameterKey": "SubDomain",
+    "ParameterValue": "www"
+  },
+  {
+    "ParameterKey": "HostedZoneId",
+    "ParameterValue": "Z00073171ATRAOHT1QTOE"
+  },
+  {
+    "ParameterKey": "CreateApex",
+    "ParameterValue": "yes"
+  },
+
+  
+  {
+    "ParameterKey": "Response404File",
+    "ParameterValue": "/index.html"
+  },
+  {
+    "ParameterKey": "Response403File",
+    "ParameterValue": "/index.html"
+  }
+]
