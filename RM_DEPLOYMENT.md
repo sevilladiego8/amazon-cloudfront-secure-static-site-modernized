@@ -15,7 +15,7 @@
 2. Create bucket to store cloudformation artifacts
 
     ```bash
-    aws s3 mb s3://diegosevilla.com.cf-artifacts --region us-east-1
+    aws s3 mb s3://customdomain.com.cf-artifacts --region us-east-1
     ```
 
 3. Run the following AWS CLI command to package the CloudFormation template. The template uses the [AWS Serverless Application Model](https://aws.amazon.com/about-aws/whats-new/2016/11/introducing-the-aws-serverless-application-model/), so it must be transformed before you can deploy it.
@@ -23,9 +23,8 @@
    ```bash
    aws --region us-east-1 cloudformation package \
        --template-file templates/main.yaml \
-       --s3-bucket diegosevilla.com.cf-artifacts \
+       --s3-bucket customdomain.com.cf-artifacts \
        --output-template-file packaged.template
-       --debug
    ```
 
    If everything is successfull this output will appear: 
@@ -38,7 +37,7 @@
 
    ```bash
    aws --region us-east-1 cloudformation deploy \
-       --stack-name diegosevillacom-cf-stack \
+       --stack-name customdomaincom-cf-stack \
        --template-file packaged.template \
        --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
        --parameter-overrides file://config/custom-params.json
@@ -51,7 +50,7 @@
 
 > In case of errors, double check the logs of the stack and nested stacks. After understanding the error, perform necessary adjustments, delete the stack and finally re-run the previous command.
 
-6. Go checkout your website address `diegosevilla.com`
+6. Go checkout your website address `customdomain.com`
 
 
 # Uploading Assets to S3 (Vite+React)
@@ -59,7 +58,7 @@
 1. Create infrastructure with CloudFormation
 
    ```bash
-   aws cloudformation deploy --template-file cloudformation.yaml --stack-name diegosevillacom-cf-stack
+   aws cloudformation deploy --template-file cloudformation.yaml --stack-name customdomaincom-cf-stack
    ```
 
 2. Build your site locally with Vite

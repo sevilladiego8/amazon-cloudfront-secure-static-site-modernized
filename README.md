@@ -3,7 +3,7 @@
   <img src="./assets/aws-cloudfront-secure-static-site-modern-banner.png" alt="aws-cloudfront-secure-static-site-modern-banner" >
 <br>
 <br>
-Modern CloudFront Secure Static Site on AWS
+CloudFront Secure Static Site Modernized
 </h1>
 <h2 align="center" >Version 2026</h2>
 
