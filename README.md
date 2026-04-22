@@ -24,14 +24,13 @@ This project was started from the public `aws-samples/amazon-cloudfront-secure-s
 0.  [Prerequisites](#prerequisites)
 1.  [What This Project Deploys?](#what-this-project-deploys)
 2.  [Purpose of The Project](#purpose-of-the-project)
-3.  [Modernization Summary](#modernization-summary)
-4.  [Key Differences From Upstream v0.5](#key-differences-from-upstream-v05)
-5.  [Repository Structure](#repository-structure)
-6.  [Deployment Notes](#deployment-notes)
-7.  [Who This Repo Is For](#who-this-repo-is-for)
-8.  [Provenance Note](#provenance-note)
-9.  [Useful Resources](#useful-resources)
-10. [License](#license)
+3.  [Modernization Summary & Key Differences from Upstream v0.5](#modernization-summary--key-differences-from-upstream-v05)
+4.  [Repository Structure](#repository-structure)
+5.  [Deployment Notes](#deployment-notes)
+6.  [Who This Repo Is For](#who-this-repo-is-for)
+7.  [Provenance Note](#provenance-note)
+8.  [Useful Resources](#useful-resources)
+9. [License](#license)
 
 
 # Prerequisites
@@ -64,37 +63,22 @@ This repo modernizes that approach by adopting the direction later visible in th
 
 ---
 
-# Modernization summary
-
-- Replacing **OAI** with Origin Access Control (OAC) for secure S3 access
-- Upgrading helper functions to **Node.js 20**
-- Using CloudFront Response Headers Policies instead of Lambda@Edge
-- Applying least-privilege IAM for S3 operations
-- Keeping the **S3 origin** private behind **CloudFront**
-- Adding improved **logging**, encryption, and ownership controls
-- Supporting optional apex domains (`example.com` + www)
-- Introducing explicit resource naming parameters
-- Defining custom cache and origin request policies
-- Enabling **SPA-friendly** error handling (403/404 → 200)
-
-See the full details in [Modernization Summary Detals](./RM_MODERNIZATION_SUMMARY.md)
-
----
-
-# Key Differences From Upstream v0.5
+# Modernization summary & Key Differences from Upstream v0.5
 
 Compared with the older v0.5 version of the AWS sample, this repo makes the following major changes:
 
-- replaces **OAI** with **OAC**
-- replaces **Node.js 12** with **Node.js 20** for the copy helper
-- removes the **Lambda@Edge** response-header function in favor of **CloudFront ResponseHeadersPolicy**
-- tightens S3 IAM permissions for the copy helper role
-- adds optional **apex record** support
+- Replacing **OAI** with Origin Access Control (OAC) for secure S3 access
+- replaces **Node.js 12** with **Node.js 20** for the copy helper function
+- Removes the **Lambda@Edge** response-header function in favor of **CloudFront Response Headers Policy**
+- Applying least-privilege **IAM** for **S3** operations
+- Keeping the **S3 origin** private behind **CloudFront**
+- Adding improved **logging**, encryption, and ownership controls
+- Supporting optional apex domains (`example.com` + www)
+- Defining custom **Cache Policy** and **Origin Request Policy**
+- Enabling **SPA-friendly** error handling (403/404 → 200)
 - adds explicit **resource naming parameters**
-- adds custom **CachePolicy** and **OriginRequestPolicy**
-- customizes **security headers**, especially the CSP
-- changes `403` and `404` behavior for frontend-friendly routing
-- keeps the S3 origin private and CloudFront-only
+
+See the full details in [Modernization Summary Detals](./RM_MODERNIZATION_SUMMARY.md)
 
 ---
 
@@ -104,7 +88,7 @@ This repo follows the same overall modernization path visible in the upstream **
 
 - **OAC** instead of **OAI**
 - **Node.js 20** for the copy helper runtime
-- **ResponseHeadersPolicy** instead of Lambda@Edge for response security headers
+- **ResponseHeadersPolicy** instead of **Lambda@Edge** for response security headers
 - more scoped IAM for the S3 copy function
 - optional apex-domain support
 
