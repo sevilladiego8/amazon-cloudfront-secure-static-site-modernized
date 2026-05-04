@@ -123,7 +123,7 @@ scripts/                  # other useful scripts
 
 # Deployment Notes
 
-> You can check a **live demo** of the deployment here [What This Project Deploys?](#what-this-project-deploys)
+> You can check a **live demo** of the deployed website here [What This Project Deploys?](#what-this-project-deploys)
 
 This template is intended for deployment in **us-east-1**, which is required for ACM certificates used with CloudFront.
 
