@@ -22,21 +22,23 @@ This project was started from the public `aws-samples/amazon-cloudfront-secure-s
 <p>
 
 0.  [Prerequisites](#prerequisites)
-1.  [What This Project Deploys?](#what-this-project-deploys)
-2.  [Purpose of The Project](#purpose-of-the-project)
-3.  [Modernization Summary & Key Differences from Upstream v0.5](#modernization-summary--key-differences-from-upstream-v05)
-4.  [Repository Structure](#repository-structure)
-5.  [Deployment Notes](#deployment-notes)
-6.  [Who This Repo Is For](#who-this-repo-is-for)
-7.  [Provenance Note](#provenance-note)
-8.  [Useful Resources](#useful-resources)
-9. [License](#license)
+2.  [What This Project Deploys?](#what-this-project-deploys)
+3.  [Purpose of The Project](#purpose-of-the-project)
+4.  [Modernization Summary & Key Differences from Upstream v0.5](#modernization-summary--key-differences-from-upstream-v05)
+5.  [Repository Structure](#repository-structure)
+6.  [Deployment Notes](#deployment-notes)
+7.  [Who This Repo Is For](#who-this-repo-is-for)
+8.  [Provenance Note](#provenance-note)
+9.  [Useful Resources](#useful-resources)
+10. [License](#license)
 
 
 # Prerequisites
 
 1. You need a registered domain name, such as `customdomain.com`, and point it to a **Route 53 hosted zone** in the same AWS account in which you deploy this solution. See [Configuring Amazon Route 53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring.html) as your DNS service to learn more
 2. You need the **AWS CLI** installed on your machine. Check [AWS CLI Docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) to learn more.
+
+**Notes on costs**: If you’re concerned about costs, this setup is generally very affordable. The main upfront expense is your domain name, which typically costs around **$12–15** per year and can be reused across projects. Beyond that, services like **Amazon CloudFront**, storage, and DNS operate on a pay-as-you-go basis. For low-traffic static sites, these costs are usually minimal. — often just a few cents to a couple of dollars per month —
 
 # What this project deploys?
 
